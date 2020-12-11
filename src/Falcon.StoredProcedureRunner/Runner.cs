@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Reflection;
@@ -137,8 +138,27 @@ namespace Falcon.StoredProcedureRunner
             foreach(var p in typeof(T).GetProperties()) {
                 if(!p.CanRead || ignoreProp(p))
                     continue;
-                yield return new SqlParameter($"@{getPrarmName(p)}",p.GetValue(data));
+                var pt = getPrarmType(p);
+                if(pt.HasValue) {
+                    var np = new SqlParameter($"@{getPrarmName(p)}",pt);
+                    np.Value = p.GetValue(data);
+                    yield return np;
+                } else {
+                    yield return new SqlParameter($"@{getPrarmName(p)}",p.GetValue(data));
+                }
             }
+        }
+
+        /// <summary>
+        /// 获取存储过程参数类型
+        /// </summary>
+        /// <param name="p">对应的属性</param>
+        private static SqlDbType? getPrarmType(PropertyInfo p) {
+            var np = p.GetCustomAttribute<FalconSPPrarmTypeAttribute>(true);
+            if(np != null && np is FalconSPPrarmTypeAttribute na) {
+                return na.PType;
+            }
+            return null;
         }
 
         /// <summary>
