@@ -4,8 +4,6 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,7 +42,7 @@ namespace Falcon.StoredProcedureRunner
         public IEnumerable<object> Run<TPrarmType>(DbContext db,TPrarmType data) {
             var rType = getRequtnType(typeof(TPrarmType));
             if(rType == null) {
-                throw new Exception("必须在参数类型上设置ReturnTypeAttribute");
+                throw new ReturnTypeException();
             }
             return Run(db,typeof(TPrarmType),rType,data);
         }
@@ -58,7 +56,13 @@ namespace Falcon.StoredProcedureRunner
         /// <param name="data">参数数据</param>
         /// <returns>查询结果枚举</returns>
         public IEnumerable<TReturnType> Run<TPrarmType, TReturnType>(DbContext db,TPrarmType data) where TReturnType : class, new() {
-            return Run(db,typeof(TPrarmType),typeof(TReturnType),data).Cast<TReturnType>();
+            try {
+                return Run(db,typeof(TPrarmType),typeof(TReturnType),data).Cast<TReturnType>();
+            } catch(InvalidCastException ice) {
+                throw new ReturnTypeCastException(ice);
+            } catch(Exception ex) {
+                throw ex;
+            }
         }
 
         /// <summary>
@@ -75,7 +79,7 @@ namespace Falcon.StoredProcedureRunner
             var connection = db.Database.GetDbConnection();
             using(var cmd = connection.CreateCommand()) {
                 cmd.CommandText = pm;
-                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddRange(paras);
                 connection.Open();
                 var dr = cmd.ExecuteReader();
