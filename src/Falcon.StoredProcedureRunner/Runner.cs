@@ -86,6 +86,7 @@ namespace Falcon.StoredProcedureRunner
                 var result = new List<object>();
                 if(!dr.CanGetColumnSchema())
                     return result;
+                int rowId = 0;
                 while(dr.Read()) {
                     var item = returnType.Assembly.CreateInstance(returnType.FullName);
                     var columnSchema = dr.GetColumnSchema();
@@ -95,9 +96,14 @@ namespace Falcon.StoredProcedureRunner
                         var pi = getProperty(returnType,name);
                         if(pi == null || !pi.CanWrite)
                             continue;
-                        pi.SetValue(item,value);
+                        try {
+                            pi.SetValue(item,value);
+                        } catch(Exception ex) {
+                            throw new ReturnDataSetValueException(rowId,name,pi,value,ex);
+                        }
                     }
                     result.Add(item);
+                    rowId++;
                 }
                 connection.Close();
                 return result;
