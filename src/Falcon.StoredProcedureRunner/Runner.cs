@@ -21,7 +21,7 @@ namespace Falcon.StoredProcedureRunner
         /// <param name="db">数据上下文</param>
         /// <param name="data">参数数据</param>
         public int Execute<TPrarmType>(DbContext db,TPrarmType data) {
-            var parms = getParams(data).ToArray();
+            var parms = getParams(typeof(TPrarmType),data).ToArray();
             var pName = getProcuderName<TPrarmType>();
 
 #if NETSTANDARD2_1
@@ -75,7 +75,7 @@ namespace Falcon.StoredProcedureRunner
         /// <returns>查询结果枚举</returns>
         public IEnumerable<object> Run(DbContext db,Type prarmType,Type returnType,object data) {
             var pm = getProcuderName(prarmType);
-            var paras = getParams(data).ToArray();
+            var paras = getParams(prarmType,data).ToArray();
             var connection = db.Database.GetDbConnection();
             using(var cmd = connection.CreateCommand()) {
                 cmd.CommandText = pm;
@@ -134,12 +134,12 @@ namespace Falcon.StoredProcedureRunner
         /// <summary>
         /// 获取存储过程参数枚举
         /// </summary>
-        /// <typeparam name="T">参数模型类型</typeparam>
+        ///<param name="type">数据的类型</param>
         /// <param name="data">参数实例</param>
-        private static IEnumerable<SqlParameter> getParams<T>(T data) {
+        private static IEnumerable<SqlParameter> getParams(Type type,object data) {
             if(data == null)
                 yield break;
-            foreach(var p in typeof(T).GetProperties()) {
+            foreach(var p in type.GetProperties()) {
                 if(!p.CanRead || ignoreProp(p))
                     continue;
                 var pt = getPrarmType(p);
