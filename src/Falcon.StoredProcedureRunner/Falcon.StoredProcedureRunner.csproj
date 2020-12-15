@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <PackageProjectUrl>https://github.com/FalconWu2017/Falcon.StoredProcedureRunner</PackageProjectUrl>
     <RepositoryUrl>https://github.com/FalconWu2017/Falcon.StoredProcedureRunner</RepositoryUrl>
