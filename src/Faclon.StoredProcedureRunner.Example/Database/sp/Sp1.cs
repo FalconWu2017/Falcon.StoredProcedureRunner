@@ -20,6 +20,11 @@ namespace Faclon.StoredProcedureRunner.Example.Database.sp
         /// 整数2
         /// </summary>
         public int P2 { get; set; } = 2;
+        /// <summary>
+        /// 字符串P3
+        /// </summary>
+        [FalconSPPrarmType(System.Data.SqlDbType.VarChar)]
+        public string P3 { get; set; } = "abcd";
     }
     /// <summary>
     /// 存储过程执行结果
@@ -46,5 +51,9 @@ namespace Faclon.StoredProcedureRunner.Example.Database.sp
         /// 求除法
         /// </summary>
         public double Chu { get; set; }
+        /// <summary>
+        /// 字符串返回值
+        /// </summary>
+        public string s { get; set; }
     }
 }

@@ -18,5 +18,9 @@ namespace Faclon.StoredProcedureRunner.Example.Database
         public IEnumerable<Sp1_Result> RunSp1(Sp1 data) {
             return this.SpRunner.Run<Sp1,Sp1_Result>(this,data);
         }
+
+        public int RunSp1No(Sp1 data) {
+            return this.SpRunner.Execute(this,data);
+        }
     }
 }

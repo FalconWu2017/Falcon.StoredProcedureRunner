@@ -23,13 +23,9 @@ namespace Falcon.StoredProcedureRunner
         public int Execute<TPrarmType>(DbContext db,TPrarmType data) {
             var parms = getParams(typeof(TPrarmType),data).ToArray();
             var pName = getProcuderName<TPrarmType>();
-
-#if NETSTANDARD2_1
-            return db.Database.ExecuteSqlRaw(pName,parms);
-#else
-            return db.Database.ExecuteSqlCommand(pName,parms);
-#endif
-            ;
+            var paramStr = getParamStr(typeof(TPrarmType),data);
+            var str = $"exec {pName} {paramStr}";
+            return db.Database.ExecuteSqlRaw(str,parms);
         }
 
         /// <summary>
@@ -215,6 +211,21 @@ namespace Falcon.StoredProcedureRunner
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// 生成存储过程参数字符串
+        /// </summary>
+        /// <param name="type">参数类型</param>
+        /// <param name="data">参数对象</param>
+        /// <returns>一个参数字符串。比如@p2=@p4,@p1=@p3</returns>
+        private static string getParamStr(Type type,object data) {
+            var paras = getParams(type,data).ToArray();
+            var result = " ";
+            for(int i = 0;i < paras.Count();i++) {
+                result += $"{paras[i].ParameterName}={{{i}}},";
+            }
+            return result.TrimEnd(',');
         }
 
     }
