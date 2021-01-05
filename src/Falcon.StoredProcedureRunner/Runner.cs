@@ -29,39 +29,6 @@ namespace Falcon.StoredProcedureRunner
         }
 
         /// <summary>
-        /// 根据模型定义参数执行存储过程进行查询，参数类型必须定义ReturnTypeAttribute特性
-        /// </summary>
-        /// <typeparam name="TPrarmType">存储过程参数类型</typeparam>
-        /// <param name="db">数据上下文</param>
-        /// <param name="data">存储过程参数</param>
-        /// <returns>返回类型枚举FalconSPReturnTypeAttribute定义的类型枚举。</returns>
-        public IEnumerable<object> Run<TPrarmType>(DbContext db,TPrarmType data) {
-            var rType = getRequtnType(typeof(TPrarmType));
-            if(rType == null) {
-                throw new ReturnTypeException();
-            }
-            return Run(db,typeof(TPrarmType),rType,data);
-        }
-
-        /// <summary>
-        /// 通过数据库上下文执行存储过程，并返回查询结果
-        /// </summary>
-        /// <typeparam name="TPrarmType">参数类型</typeparam>
-        /// <typeparam name="TReturnType">返回结果项类型</typeparam>
-        /// <param name="db">数据上下文</param>
-        /// <param name="data">参数数据</param>
-        /// <returns>查询结果枚举</returns>
-        public IEnumerable<TReturnType> Run<TPrarmType, TReturnType>(DbContext db,TPrarmType data) where TReturnType : class, new() {
-            try {
-                return Run(db,typeof(TPrarmType),typeof(TReturnType),data).Cast<TReturnType>();
-            } catch(InvalidCastException ice) {
-                throw new ReturnTypeCastException(ice);
-            } catch(Exception ex) {
-                throw ex;
-            }
-        }
-
-        /// <summary>
         /// 通过数据库上下文执行存储过程，并返回查询结果
         /// </summary>
         /// <param name="db">数据库上下文</param>
@@ -119,18 +86,6 @@ namespace Falcon.StoredProcedureRunner
                 return pna.ProcuderName;
             }
             return pramType.Name;
-        }
-
-        /// <summary>
-        /// 获取存储过程名返回值类型
-        /// </summary>
-        /// <param name="pramType">返回值类型</param>
-        private static Type getRequtnType(Type pramType) {
-            var attr = pramType.GetCustomAttribute<FalconSPReturnTypeAttribute>();
-            if(attr != null && attr is FalconSPReturnTypeAttribute pna && pna.ReturnType != null) {
-                return pna.ReturnType;
-            }
-            return null;
         }
 
         /// <summary>
