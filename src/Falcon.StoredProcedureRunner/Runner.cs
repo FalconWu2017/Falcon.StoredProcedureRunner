@@ -101,7 +101,7 @@ namespace Falcon.StoredProcedureRunner
                     continue;
                 var pt = getPrarmType(p);
                 if(pt.HasValue) {
-                    var np = new SqlParameter($"@{getPrarmName(p)}",pt);
+                    var np = new SqlParameter($"@{getPrarmName(p)}",pt.Value);
                     np.Value = p.GetValue(data);
                     yield return np;
                 } else {
