@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
@@ -72,8 +73,42 @@ namespace Falcon.StoredProcedureRunner
                 return result;
             }
         }
+
+        /// <summary>
+        /// （存在sql注入风险）执行Sql语句，并将数据库返回结果以json数据对象返回。
+        /// </summary>
+        /// <param name="db">数据上下文</param>
+        /// <param name="sql">要执行的sql语句</param>
+        /// <returns>数据库返回值json格式</returns>
+        public string RunRaw(DbContext db,string sql) {
+            var connection = db.Database.GetDbConnection();
+            using(var cmd = connection.CreateCommand()) {
+                cmd.CommandText = sql;
+                cmd.CommandType = System.Data.CommandType.Text;
+                connection.Open();
+                var dr = cmd.ExecuteReader();
+                var result = new StringBuilder();
+                if(!dr.CanGetColumnSchema())
+                    return "";
+                while(dr.Read()) {
+                    var item = new StringBuilder();
+                    var columnSchema = dr.GetColumnSchema();
+                    for(var i = 0;i < columnSchema.Count;i++) {
+                        var name = dr.GetName(i);
+                        var value = dr.IsDBNull(i) ? null : dr.GetValue(i);
+                        item.Append($"\"{name}\":\"{value}\",");
+                    }
+                    result.Append($"{{{item.ToString().TrimEnd(',')}}},");
+                }
+                connection.Close();
+                return "[" + result.ToString().TrimEnd(',') + "]";
+            }
+        }
     }
 
+    /// <summary>
+    /// 内部保护方法
+    /// </summary>
     public partial class Runner
     {
         /// <summary>

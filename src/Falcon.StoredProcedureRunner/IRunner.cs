@@ -26,5 +26,13 @@ namespace Falcon.StoredProcedureRunner
         /// <param name="data">执行参数</param>
         /// <returns>查询结果枚举</returns>
         IEnumerable<object> Run(DbContext db,Type prarmType,Type returnType ,object data) ;
+
+        /// <summary>
+        /// （存在sql注入风险）执行Sql语句，并将数据库返回结果以json数据对象返回。
+        /// </summary>
+        /// <param name="db">数据上下文</param>
+        /// <param name="sql">要执行的sql语句</param>
+        /// <returns>数据库返回值json格式</returns>
+        string RunRaw(DbContext db,string sql);
     }
 }
