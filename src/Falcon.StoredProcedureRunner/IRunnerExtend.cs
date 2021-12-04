@@ -45,8 +45,8 @@ namespace Falcon.StoredProcedureRunner
                 return runner.Run(db,typeof(TPrarmType),typeof(TReturnType),data).Cast<TReturnType>();
             } catch(InvalidCastException ice) {
                 throw new ReturnTypeCastException(ice);
-            } catch(Exception ex) {
-                throw ex;
+            } catch(Exception) {
+                throw;
             }
         }
 

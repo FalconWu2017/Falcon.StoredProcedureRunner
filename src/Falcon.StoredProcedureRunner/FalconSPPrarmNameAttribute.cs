@@ -5,6 +5,7 @@ namespace Falcon.StoredProcedureRunner
     /// <summary>
     /// 定义名称
     /// </summary>
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     public class FalconSPPrarmNameAttribute:Attribute
     {
         /// <summary>
