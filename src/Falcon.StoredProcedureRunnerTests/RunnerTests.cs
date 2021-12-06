@@ -13,11 +13,13 @@ namespace Falcon.StoredProcedureRunner.Tests
         public void RunTest()
         {
             OracleTest();
+            System.Console.WriteLine("---------------------");
             SqlserverTest();
         }
 
         public void SqlserverTest()
         {
+            System.Console.WriteLine("SqlserverTest start!");
             var configurationBuilder = new ConfigurationBuilder();
             configurationBuilder.AddJsonFile("AppSettings.json");
             var config = configurationBuilder.Build();
@@ -33,12 +35,16 @@ namespace Falcon.StoredProcedureRunner.Tests
                 p3 = "abc,"
             }).ToList();
             Assert.IsNotNull(result);
+            System.Console.WriteLine("result ok");
             CollectionAssert.AllItemsAreNotNull(result);
             Assert.IsTrue(result.Count > 0);
+            System.Console.WriteLine($"result count {result.Count}");
+            System.Console.WriteLine("SqlserverTest over!");
         }
 
         public void OracleTest()
         {
+            System.Console.WriteLine("OracleTest start!");
             var configurationBuilder = new ConfigurationBuilder();
             configurationBuilder.AddJsonFile("AppSettings.json");
             var config = configurationBuilder.Build();
@@ -53,8 +59,11 @@ namespace Falcon.StoredProcedureRunner.Tests
                 v_orgaid = "50e3d44d-9ca2-4fbd-9d5d-d32339b1b113",
             }).ToList();
             Assert.IsNotNull(result);
+            System.Console.WriteLine("result ok");
             CollectionAssert.AllItemsAreNotNull(result);
             Assert.IsTrue(result.Count > 0);
+            System.Console.WriteLine($"result count {result.Count}");
+            System.Console.WriteLine("OracleTest over!");
         }
     }
 }
