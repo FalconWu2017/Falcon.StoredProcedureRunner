@@ -5,11 +5,14 @@
 		<Nullable>enable</Nullable>
 
 		<IsPackable>false</IsPackable>
+
+		<UserSecretsId>44468cb2-b159-42bd-a799-b3f004be5f68</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
 		<PackageReference Include="MSTest.TestAdapter" Version="2.2.7" />
 		<PackageReference Include="MSTest.TestFramework" Version="2.2.7" />

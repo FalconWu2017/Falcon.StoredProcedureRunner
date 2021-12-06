@@ -22,6 +22,7 @@ namespace Falcon.StoredProcedureRunner.Tests
             System.Console.WriteLine("SqlserverTest start!");
             var configurationBuilder = new ConfigurationBuilder();
             configurationBuilder.AddJsonFile("AppSettings.json");
+            configurationBuilder.AddUserSecrets(this.GetType().Assembly);
             var config = configurationBuilder.Build();
             var sql = config.GetSection("db:sqlserver").Value;
             var buider = new DbContextOptionsBuilder();
@@ -47,6 +48,7 @@ namespace Falcon.StoredProcedureRunner.Tests
             System.Console.WriteLine("OracleTest start!");
             var configurationBuilder = new ConfigurationBuilder();
             configurationBuilder.AddJsonFile("AppSettings.json");
+            configurationBuilder.AddUserSecrets(this.GetType().Assembly);
             var config = configurationBuilder.Build();
             var ora = config.GetSection("db:oracle").Value;
             var oraVer = config.GetSection("db:ver").Value;
