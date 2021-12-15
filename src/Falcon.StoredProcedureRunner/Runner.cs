@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
@@ -45,47 +46,127 @@ namespace Falcon.StoredProcedureRunner
         /// <returns>查询结果枚举</returns>
         public IEnumerable<object> Run(DbContext db, Type prarmType, Type returnType, object data)
         {
+            return RunByReader(db, prarmType, returnType, data);
+        }
+
+
+        /// <summary>
+        /// 通过数据库上下文执行存储过程，并返回查询结果
+        /// </summary>
+        /// <param name="db">数据库上下文</param>
+        /// <param name="prarmType">参数类型</param>
+        /// <param name="returnType">返回值类型</param>
+        /// <param name="data">存储过程参数</param>
+        /// <returns>查询结果枚举</returns>
+        public IEnumerable<object> RunByReader(DbContext db, Type prarmType, Type returnType, object data)
+        {
             var pm = getProcuderName(prarmType);
             var paras = getParams(db, prarmType, data).ToArray();
             var connection = db.Database.GetDbConnection();
-            using (var cmd = connection.CreateCommand())
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = pm;
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddRange(paras);
+            connection.Open();
+            using var dr = cmd.ExecuteReader();
+            var columnSchema = dr.GetColumnSchema();
+            var result = new List<object>();
+            if (!dr.CanGetColumnSchema())
+                return result;
+            int rowId = 0;
+            while (dr.Read())
             {
-                cmd.CommandText = pm;
+                var item = returnType.Assembly.CreateInstance(returnType.FullName);
+                for (var i = 0; i < columnSchema.Count; i++)
+                {
+                    var name = dr.GetName(i);
+                    var value = dr.IsDBNull(i) ? null : dr.GetValue(i);
+                    var pi = getProperty(returnType, name);
+                    if (pi == null || !pi.CanWrite)
+                        continue;
+                    try
+                    {
+                        pi.SetValue(item, value);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new ReturnDataSetValueException(rowId, name, pi, value, ex);
+                    }
+                }
+                result.Add(item);
+                rowId++;
+            }
+            connection.Close();
+            return result;
+        }
+
+        /// <summary>
+        /// 通过数据库上下文执行存储过程，并返回查询结果
+        /// </summary>
+        /// <param name="db">数据库上下文</param>
+        /// <param name="prarmType">参数类型</param>
+        /// <param name="returnType">返回值类型</param>
+        /// <param name="data">存储过程参数</param>
+        /// <returns>查询结果枚举</returns>
+        public IEnumerable<object> RunByDbset(DbContext db, Type prarmType, Type returnType, object data)
+        {
+            var result = new List<object>();
+            var pm = getProcuderName(prarmType);
+            var paras = getParams(db, prarmType, data).ToArray();
+            DbConnection connection = db.Database.GetDbConnection();
+            DataSet ds = new DataSet();
+            if (db.Database.IsOracle())
+            {
+                var conn = db.Database.GetDbConnection() as OracleConnection;
+                using var cmd = new OracleCommand(pm, conn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddRange(paras);
-                connection.Open();
-                var dr = cmd.ExecuteReader();
-                var result = new List<object>();
-                if (!dr.CanGetColumnSchema())
-                    return result;
-                int rowId = 0;
-                while (dr.Read())
-                {
-                    var item = returnType.Assembly.CreateInstance(returnType.FullName);
-                    var columnSchema = dr.GetColumnSchema();
-                    for (var i = 0; i < columnSchema.Count; i++)
-                    {
-                        var name = dr.GetName(i);
-                        var value = dr.IsDBNull(i) ? null : dr.GetValue(i);
-                        var pi = getProperty(returnType, name);
-                        if (pi == null || !pi.CanWrite)
-                            continue;
-                        try
-                        {
-                            pi.SetValue(item, value);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw new ReturnDataSetValueException(rowId, name, pi, value, ex);
-                        }
-                    }
-                    result.Add(item);
-                    rowId++;
-                }
-                connection.Close();
-                return result;
+                var da = new OracleDataAdapter(cmd);
+                da.Fill(ds);
             }
+            else if (db.Database.IsSqlServer())
+            {
+                var oracleConn = db.Database.GetDbConnection() as SqlConnection;
+                using var oracleCmd = new SqlCommand(pm, oracleConn);
+                oracleCmd.CommandType = CommandType.StoredProcedure;
+                oracleCmd.Parameters.AddRange(paras);
+                var da = new SqlDataAdapter(oracleCmd);
+                da.Fill(ds);
+            }
+            else
+            {
+                throw new DatabaseNotSupportedException();
+            }
+            var rows = ds.Tables[0].Rows;
+            var cols = ds.Tables[0].Columns;
+            for (int i = 0; i < rows.Count; i++)
+            {
+                var item = returnType.Assembly.CreateInstance(returnType.FullName);
+                var row = rows[i];
+                for (int y = 0; y < cols.Count; y++)
+                {
+                    var name = cols[y].ColumnName;
+                    var val = row[y] is DBNull ? null : row[y];
+                    var pi = getProperty(returnType, name);
+                    if (pi == null || !pi.CanWrite)
+                        continue;
+                    try
+                    {
+                        pi.SetValue(item, val);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new ReturnDataSetValueException(i, name, pi, val, ex);
+                    }
+                }
+                result.Add(item);
+            }
+            connection.Close();
+            return result;
         }
+
+
+
 
         /// <summary>
         /// （存在sql注入风险）执行Sql语句，并将数据库返回结果以json数据对象返回。
