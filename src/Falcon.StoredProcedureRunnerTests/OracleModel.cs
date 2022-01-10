@@ -1,4 +1,5 @@
 ﻿using Falcon.StoredProcedureRunner;
+using Falcon.StoredProcedureRunner.Attributes;
 using System.Data;
 
 namespace Falcon.StoredProcedureRunnerTests
@@ -25,26 +26,23 @@ namespace Falcon.StoredProcedureRunnerTests
     public class Tjjk_Tjgh
     {
         /// <summary>
-        /// 身份证号码
-        /// </summary>
-        public string v_sfz { get; set; }
-        /// <summary>
         /// 医疗机构代码
         /// </summary>
         public string v_yljgdm { get; set; }
+        /// <summary>
+        /// 身份证号码
+        /// </summary>
+        public string v_sfz { get; set; }
         /// <summary>
         /// 挂号日期 格式yyyyMMdd
         /// </summary>
         public string v_ghrq { get; set; }
 
-        [FalconSPPrarmDirection(ParameterDirection.Output)]
-        [FalconSPPrarmType(FalconSPDbType.OracleRefCursor)]
-        public object v_data { get; set; }
-
     }
     /// <summary>
     /// 挂号查询结果
     /// </summary>
+    [FalconSPTempTable("TT_Tjjk_Tjgh")]
     public class Tjjk_TjghResult
     {
         /// <summary>

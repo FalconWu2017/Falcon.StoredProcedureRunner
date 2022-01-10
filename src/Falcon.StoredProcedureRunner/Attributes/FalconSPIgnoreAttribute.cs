@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Falcon.StoredProcedureRunner
+namespace Falcon.StoredProcedureRunner.Attributes
 {
     /// <summary>
     /// 表示调用时候忽略此属性

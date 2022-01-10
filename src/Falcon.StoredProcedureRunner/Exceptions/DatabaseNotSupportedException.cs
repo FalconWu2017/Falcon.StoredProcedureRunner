@@ -3,7 +3,7 @@
 namespace Falcon.StoredProcedureRunner
 {
     /// <summary>
-    /// 设置返回对象值时候发生异常
+    /// 不支持的数据库类型
     /// </summary>
     public class DatabaseNotSupportedException : Exception
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Falcon.StoredProcedureRunner
+namespace Falcon.StoredProcedureRunner.Attributes
 {
     /// <summary>
     /// 定义存储过程名称

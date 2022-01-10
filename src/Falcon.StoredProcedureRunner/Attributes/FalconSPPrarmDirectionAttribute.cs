@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data;
 
-namespace Falcon.StoredProcedureRunner
+namespace Falcon.StoredProcedureRunner.Attributes
 {
     /// <summary>
     /// 定义存储过程参数方向。默认Input

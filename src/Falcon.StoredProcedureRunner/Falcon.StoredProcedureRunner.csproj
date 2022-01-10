@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net5.0</TargetFrameworks>
 	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	  <Version>2.0.0</Version>
+	  <Version>2.1.0</Version>
 	  <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
 	  <PackageProjectUrl>https://github.com/FalconWu2017/Falcon.StoredProcedureRunner</PackageProjectUrl>
 	  <RepositoryUrl>https://github.com/FalconWu2017/Falcon.StoredProcedureRunner</RepositoryUrl>

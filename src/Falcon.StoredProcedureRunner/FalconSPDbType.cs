@@ -6,6 +6,7 @@
     /// </summary>
     public enum FalconSPDbType
     {
+#pragma warning disable CS1591 // 缺少对公共可见类型或成员的 XML 注释
         //
         // 摘要:
         //     System.Int64. A 64-bit signed integer.
@@ -201,7 +202,6 @@
         OracleBoolean = 134,
         OracleJson = 135
 
+#pragma warning restore CS1591 // 缺少对公共可见类型或成员的 XML 注释
     }
-
-
 }

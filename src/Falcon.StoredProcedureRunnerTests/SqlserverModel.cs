@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Falcon.StoredProcedureRunner.Attributes;
 
 namespace Falcon.StoredProcedureRunnerTests
 {
-    [Falcon.StoredProcedureRunner.FalconSPProcuderName("TestSp1")]
+    [FalconSPProcuderName("TestSp1")]
     public class SqlserverModel
     {
         public int p1 { get; set; }

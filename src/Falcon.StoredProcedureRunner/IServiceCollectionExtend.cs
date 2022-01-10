@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 
 namespace Falcon.StoredProcedureRunner
 {
@@ -12,7 +13,8 @@ namespace Falcon.StoredProcedureRunner
         /// </summary>
         /// <param name="services">注册服务集合</param>
         /// <returns>服务集合</returns>
-        public static IServiceCollection UseFalconSPRunner(this IServiceCollection services) {
+        public static IServiceCollection UseFalconSPRunner(this IServiceCollection services)
+        {
             return services.AddFalconSPRunner();
         }
 
@@ -21,8 +23,12 @@ namespace Falcon.StoredProcedureRunner
         /// </summary>
         /// <param name="services">注册服务集合</param>
         /// <returns>服务集合</returns>
-        public static IServiceCollection AddFalconSPRunner(this IServiceCollection services) {
-            return services.AddSingleton<IRunner,Runner>();
+        public static IServiceCollection AddFalconSPRunner(this IServiceCollection services)
+        {
+            services.AddSingleton<IRunner, Runner>();
+            services.AddSingleton<IOracleRunner, OracleRunner>();
+            services.AddSingleton<ISqlServerRunner, SqlServerRunner>();
+            return services;
         }
 
     }

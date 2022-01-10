@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace Falcon.StoredProcedureRunner
+namespace Falcon.StoredProcedureRunner.Attributes
 {
     /// <summary>
     /// 定义存储过程返回值类型
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class,AllowMultiple = false,Inherited = false)]
-    public class FalconSPReturnTypeAttribute:Attribute
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    public class FalconSPReturnTypeAttribute : Attribute
     {
         /// <summary>
         /// 返回的数据类型

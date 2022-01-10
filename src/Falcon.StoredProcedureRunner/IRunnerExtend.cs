@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Falcon.StoredProcedureRunner.Attributes;
 using Microsoft.EntityFrameworkCore;
 
 namespace Falcon.StoredProcedureRunner
